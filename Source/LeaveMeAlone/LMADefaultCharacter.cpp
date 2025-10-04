@@ -53,7 +53,21 @@ void ALMADefaultCharacter::MoveRight(float Value)
 {
 	AddMovementInput(GetActorRightVector(), Value);
 }
+void ALMADefaultCharacter::ZoomCamera(float Value)
+{
+	ArmLength += Value;
+	ArmLength = ceil(ArmLength);
 
+	if ((int)ArmLength >= MaxArmLength) {
+		ArmLength = MaxArmLength;
+	}
+
+	if ((int)ArmLength <= MinArmLength) {
+		ArmLength = MinArmLength;
+	}
+
+	SpringArmComponent->TargetArmLength = ArmLength;
+}
 
 	// Called every frame
 void ALMADefaultCharacter::Tick(float DeltaTime)
@@ -82,5 +96,6 @@ void ALMADefaultCharacter::SetupPlayerInputComponent(UInputComponent* PlayerInpu
 
 	PlayerInputComponent->BindAxis("MoveForward", this, &ALMADefaultCharacter::MoveForward);
 	PlayerInputComponent->BindAxis("MoveRight", this, &ALMADefaultCharacter::MoveRight);
+	PlayerInputComponent->BindAxis("ZoomCamera", this, &ALMADefaultCharacter::ZoomCamera);
 }
 
