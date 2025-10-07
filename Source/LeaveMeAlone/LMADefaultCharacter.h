@@ -10,6 +10,9 @@ class UDecalComponent;
 class UMaterialInterface;
 class UCameraComponent;
 class USpringArmComponent;
+class ULMAHealthComponent;
+class UAnimMontage;
+
 
 UCLASS()
 class LEAVEMEALONE_API ALMADefaultCharacter : public ACharacter
@@ -21,6 +24,9 @@ public:
 	ALMADefaultCharacter();
 
 protected:
+	UPROPERTY(VisibleAnywhere, BlueprintReadWrite, Category = "Components|Health")
+	ULMAHealthComponent* HealthComponent;
+
 	UPROPERTY(VisibleAnywhere, BlueprintReadWrite, Category = "Components")
 	USpringArmComponent* SpringArmComponent;
 
@@ -36,6 +42,8 @@ protected:
 	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "Cursor")
 	FVector CursorSize = FVector(20.0f, 40.0f, 40.0f);
 	
+	UPROPERTY(EditDefaultsOnly, Category = "Animation")
+	UAnimMontage* DeathMontage;
 
 	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "Camera")
 	int MinArmLength = 400;
@@ -55,6 +63,11 @@ private:
 	void MoveRight(float Value);
 	void ZoomCamera(float Value);
 
+	void RotationPlayerOnCursor();
+
+private:
+	void OnDeath();
+	void OnHealthChanged(float NewHealth);
 
 public:	
 	// Called every frame
@@ -62,5 +75,8 @@ public:
 
 	// Called to bind functionality to input
 	virtual void SetupPlayerInputComponent(class UInputComponent* PlayerInputComponent) override;
+
+	UFUNCTION()
+	ULMAHealthComponent* GetHealthComponent() const;
 
 };
