@@ -11,6 +11,7 @@ class UMaterialInterface;
 class UCameraComponent;
 class USpringArmComponent;
 class ULMAHealthComponent;
+class ULMAEnduranceComponent;
 class UAnimMontage;
 
 
@@ -26,6 +27,9 @@ public:
 protected:
 	UPROPERTY(VisibleAnywhere, BlueprintReadWrite, Category = "Components|Health")
 	ULMAHealthComponent* HealthComponent;
+
+	UPROPERTY(VisibleAnywhere, BlueprintReadWrite, Category = "Components|Endurance")
+	ULMAEnduranceComponent* EnduranceComponent;
 
 	UPROPERTY(VisibleAnywhere, BlueprintReadWrite, Category = "Components")
 	USpringArmComponent* SpringArmComponent;
@@ -58,6 +62,8 @@ private:
 	float YRotation = -75.0f;
 	float FOV = 55.0f;
 	float ArmLength = 1400.0f;
+	float SprintMaxSpeed = 450;
+	float WalkMaxSpeed = 300;
 
 	void MoveForward(float Value);
 	void MoveRight(float Value);
@@ -68,6 +74,7 @@ private:
 private:
 	void OnDeath();
 	void OnHealthChanged(float NewHealth);
+	void OnEnduranceChanged(float NewEndurance);
 
 public:	
 	// Called every frame
@@ -78,5 +85,20 @@ public:
 
 	UFUNCTION()
 	ULMAHealthComponent* GetHealthComponent() const;
+
+	UFUNCTION()
+	ULMAEnduranceComponent* GetEnduranceComponent() const;
+
+	UFUNCTION(BlueprintCallable)
+	bool GetIsSprinting() const;
+
+	UPROPERTY()
+	bool IsSprinting = false;
+
+	UFUNCTION()
+	void StartSprint();
+	
+	UFUNCTION()
+	void EndSprint();
 
 };

@@ -3,6 +3,7 @@
 
 #include "LMADefaultCharacter.h"
 #include "Components/LMAHealthComponent.h"
+#include "Components/LMAEnduranceComponent.h"
 #include "GameFramework/CharacterMovementComponent.h"
 #include "Camera/CameraComponent.h"
 #include "Components/DecalComponent.h"
@@ -35,6 +36,7 @@ ALMADefaultCharacter::ALMADefaultCharacter()
 	bUseControllerRotationRoll = false;
 
 	HealthComponent = CreateDefaultSubobject<ULMAHealthComponent>("HealthComponent");
+	EnduranceComponent = CreateDefaultSubobject<ULMAEnduranceComponent>("EnduranceComponent");
 }
 
 // Called when the game starts or when spawned
@@ -50,17 +52,34 @@ void ALMADefaultCharacter::BeginPlay()
 	OnHealthChanged(HealthComponent->GetHealth());
 	HealthComponent->OnHealthChanged.AddUObject(this, &ALMADefaultCharacter::OnHealthChanged);
 
+	OnEnduranceChanged(EnduranceComponent->GetEndurance());
+	EnduranceComponent->OnEnduranceChanged.AddUObject(this, &ALMADefaultCharacter::OnEnduranceChanged);
+
 	HealthComponent->OnDeath.AddUObject(this, &ALMADefaultCharacter::OnDeath);
+
+	WalkMaxSpeed = GetCharacterMovement()->MaxWalkSpeed;
 }
 
 void ALMADefaultCharacter::MoveForward(float Value)
 {
 	AddMovementInput(GetActorForwardVector(), Value);
 }
+
 void ALMADefaultCharacter::MoveRight(float Value)
 {
 	AddMovementInput(GetActorRightVector(), Value);
 }
+
+void ALMADefaultCharacter::StartSprint()
+{
+	IsSprinting = true;
+}
+
+void ALMADefaultCharacter::EndSprint()
+{
+	IsSprinting = false;
+}
+
 void ALMADefaultCharacter::ZoomCamera(float Value)
 {
 	ArmLength += Value;
@@ -108,6 +127,11 @@ void ALMADefaultCharacter::OnHealthChanged(float NewHealth)
 	GEngine->AddOnScreenDebugMessage(-1, 2.0f, FColor::Red, FString::Printf(TEXT("Health = %f"), NewHealth));
 }
 
+void ALMADefaultCharacter::OnEnduranceChanged(float NewEndurance)
+{
+	GEngine->AddOnScreenDebugMessage(-1, 2.0f, FColor::Yellow, FString::Printf(TEXT("Endurance = %f"), NewEndurance));
+}
+
 	// Called every frame
 void ALMADefaultCharacter::Tick(float DeltaTime)
 {
@@ -131,6 +155,20 @@ void ALMADefaultCharacter::Tick(float DeltaTime)
 		RotationPlayerOnCursor();
 	}
 
+	GetCharacterMovement()->MaxWalkSpeed = IsSprinting ? SprintMaxSpeed : WalkMaxSpeed;
+
+	if (EnduranceComponent)
+	{
+		if (IsSprinting && !EnduranceComponent->IsEnduranceOut())
+		{
+			EnduranceComponent->ConsumeEndurance(EnduranceComponent->GetEnduranceDrainRate() * DeltaTime);
+		}
+		else
+		{
+			IsSprinting = false;
+			EnduranceComponent->RestoreEndurance(DeltaTime);
+		}
+	}
 }
 
 // Called to bind functionality to input
@@ -141,6 +179,9 @@ void ALMADefaultCharacter::SetupPlayerInputComponent(UInputComponent* PlayerInpu
 	PlayerInputComponent->BindAxis("MoveForward", this, &ALMADefaultCharacter::MoveForward);
 	PlayerInputComponent->BindAxis("MoveRight", this, &ALMADefaultCharacter::MoveRight);
 	PlayerInputComponent->BindAxis("ZoomCamera", this, &ALMADefaultCharacter::ZoomCamera);
+
+	PlayerInputComponent->BindAction("Sprint", IE_Pressed, this, &ALMADefaultCharacter::StartSprint);
+	PlayerInputComponent->BindAction("Sprint", IE_Released, this, &ALMADefaultCharacter::EndSprint);
 }
 
 ULMAHealthComponent* ALMADefaultCharacter::GetHealthComponent() const
@@ -148,3 +189,12 @@ ULMAHealthComponent* ALMADefaultCharacter::GetHealthComponent() const
 	return HealthComponent;
 }
 
+ULMAEnduranceComponent* ALMADefaultCharacter::GetEnduranceComponent() const
+{
+	return EnduranceComponent;
+}
+
+bool ALMADefaultCharacter::GetIsSprinting() const
+{
+	return IsSprinting;
+}
