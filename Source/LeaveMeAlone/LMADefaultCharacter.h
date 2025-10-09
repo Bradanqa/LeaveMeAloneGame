@@ -12,6 +12,7 @@ class UCameraComponent;
 class USpringArmComponent;
 class ULMAHealthComponent;
 class ULMAEnduranceComponent;
+class ULMAWeaponComponent;
 class UAnimMontage;
 
 
@@ -36,6 +37,9 @@ protected:
 
 	UPROPERTY(VisibleAnywhere, BlueprintReadWrite, Category = "Components")
 	UCameraComponent* CameraComponent;
+
+	UPROPERTY(VisibleAnywhere, BlueprintReadWrite, Category = "Components")
+	ULMAWeaponComponent* WeaponComponent;
 
 	UPROPERTY()
 	UDecalComponent* CurrentCursor = nullptr;
