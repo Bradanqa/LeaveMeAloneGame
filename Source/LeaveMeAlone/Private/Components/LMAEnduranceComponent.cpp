@@ -3,6 +3,7 @@
 
 #include "Components/LMAEnduranceComponent.h"
 
+
 // Sets default values for this component's properties
 ULMAEnduranceComponent::ULMAEnduranceComponent()
 {
@@ -10,7 +11,6 @@ ULMAEnduranceComponent::ULMAEnduranceComponent()
 	// off to improve performance if you don't need them.
 	PrimaryComponentTick.bCanEverTick = false;
 }
-
 
 // Called when the game starts
 void ULMAEnduranceComponent::BeginPlay()
@@ -20,11 +20,13 @@ void ULMAEnduranceComponent::BeginPlay()
 	Endurance = MaxEndurance;
 }
 
+
 void ULMAEnduranceComponent::OnEnduranceChanging(float Value)
 {
 	Endurance = FMath::Clamp(Endurance - Value, 0.0f, MaxEndurance);
 	OnEnduranceChanged.Broadcast(Endurance);
 }
+
 
 float ULMAEnduranceComponent::GetEndurance() const
 {

@@ -27,15 +27,6 @@ void ALMAHealthPickup::BeginPlay()
 
 }
 
-void ALMAHealthPickup::NotifyActorBeginOverlap(AActor* OtherActor)
-{
-	Super::NotifyActorBeginOverlap(OtherActor);
-	const auto Charcter = Cast<ALMADefaultCharacter>(OtherActor);
-	if (GivePickup(Charcter))
-	{
-		PickupWasTaken();
-	}
-}
 
 void ALMAHealthPickup::Tick(float DeltaTime)
 {
@@ -68,3 +59,13 @@ void ALMAHealthPickup::RespawnPickup()
 	GetRootComponent()->SetVisibility(true, true);
 }
 
+
+void ALMAHealthPickup::NotifyActorBeginOverlap(AActor* OtherActor)
+{
+	Super::NotifyActorBeginOverlap(OtherActor);
+	const auto Charcter = Cast<ALMADefaultCharacter>(OtherActor);
+	if (GivePickup(Charcter))
+	{
+		PickupWasTaken();
+	}
+}

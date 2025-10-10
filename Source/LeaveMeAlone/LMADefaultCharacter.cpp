@@ -13,6 +13,7 @@
 #include "Kismet/GameplayStatics.h"
 #include "Kismet/KismetMathLibrary.h"
 
+
 // Sets default values
 ALMADefaultCharacter::ALMADefaultCharacter()
 {
@@ -61,6 +62,68 @@ void ALMADefaultCharacter::BeginPlay()
 
 	WalkMaxSpeed = GetCharacterMovement()->MaxWalkSpeed;
 }
+
+// Called every frame
+void ALMADefaultCharacter::Tick(float DeltaTime)
+{
+	Super::Tick(DeltaTime);
+
+	APlayerController* PC = UGameplayStatics::GetPlayerController(GetWorld(), 0);
+	if (PC)
+	{
+		FHitResult ResultHit;
+		PC->GetHitResultUnderCursor(ECC_GameTraceChannel1, true, ResultHit);
+		float FindRotatorResultYaw = UKismetMathLibrary::FindLookAtRotation(GetActorLocation(), ResultHit.Location).Yaw;
+		SetActorRotation(FQuat(FRotator(0.0f, FindRotatorResultYaw, 0.0f)));
+		if (CurrentCursor)
+		{
+			CurrentCursor->SetWorldLocation(ResultHit.Location);
+		}
+	}
+
+	if (!(HealthComponent->IsDead()))
+	{
+		RotationPlayerOnCursor();
+	}
+
+	GetCharacterMovement()->MaxWalkSpeed = IsSprinting ? SprintMaxSpeed : WalkMaxSpeed;
+
+	if (WeaponComponent)
+	{
+		WeaponComponent->SetSprinting(IsSprinting);
+	}
+
+	if (EnduranceComponent)
+	{
+		if (IsSprinting && !EnduranceComponent->IsEnduranceOut())
+		{
+			EnduranceComponent->ConsumeEndurance(EnduranceComponent->GetEnduranceDrainRate() * DeltaTime);
+		}
+		else
+		{
+			IsSprinting = false;
+			EnduranceComponent->RestoreEndurance(DeltaTime);
+		}
+	}
+}
+
+// Called to bind functionality to input
+void ALMADefaultCharacter::SetupPlayerInputComponent(UInputComponent* PlayerInputComponent)
+{
+	Super::SetupPlayerInputComponent(PlayerInputComponent);
+
+	PlayerInputComponent->BindAxis("MoveForward", this, &ALMADefaultCharacter::MoveForward);
+	PlayerInputComponent->BindAxis("MoveRight", this, &ALMADefaultCharacter::MoveRight);
+	PlayerInputComponent->BindAxis("ZoomCamera", this, &ALMADefaultCharacter::ZoomCamera);
+
+	PlayerInputComponent->BindAction("Sprint", IE_Pressed, this, &ALMADefaultCharacter::StartSprint);
+	PlayerInputComponent->BindAction("Sprint", IE_Released, this, &ALMADefaultCharacter::EndSprint);
+
+	PlayerInputComponent->BindAction("Fire", IE_Pressed, WeaponComponent, &ULMAWeaponComponent::StartShoot);
+	PlayerInputComponent->BindAction("Fire", IE_Released, WeaponComponent, &ULMAWeaponComponent::StopShoot);
+	PlayerInputComponent->BindAction("Reload", IE_Pressed, WeaponComponent, &ULMAWeaponComponent::Reload);
+}
+
 
 void ALMADefaultCharacter::MoveForward(float Value)
 {
@@ -134,66 +197,6 @@ void ALMADefaultCharacter::OnEnduranceChanged(float NewEndurance)
 	GEngine->AddOnScreenDebugMessage(-1, 2.0f, FColor::Yellow, FString::Printf(TEXT("Endurance = %f"), NewEndurance));
 }
 
-	// Called every frame
-void ALMADefaultCharacter::Tick(float DeltaTime)
-{
-	Super::Tick(DeltaTime);
-
-	APlayerController* PC = UGameplayStatics::GetPlayerController(GetWorld(), 0);
-	if (PC)
-	{
-		FHitResult ResultHit;
-		PC->GetHitResultUnderCursor(ECC_GameTraceChannel1, true, ResultHit);
-		float FindRotatorResultYaw = UKismetMathLibrary::FindLookAtRotation(GetActorLocation(), ResultHit.Location).Yaw;
-		SetActorRotation(FQuat(FRotator(0.0f, FindRotatorResultYaw, 0.0f)));
-		if (CurrentCursor)
-		{
-			CurrentCursor->SetWorldLocation(ResultHit.Location);
-		}
-	}
-
-	if (!(HealthComponent->IsDead()))
-	{
-		RotationPlayerOnCursor();
-	}
-
-	GetCharacterMovement()->MaxWalkSpeed = IsSprinting ? SprintMaxSpeed : WalkMaxSpeed;
-
-	if (WeaponComponent)
-	{
-		WeaponComponent->SetSprinting(IsSprinting);
-	}
-
-	if (EnduranceComponent)
-	{
-		if (IsSprinting && !EnduranceComponent->IsEnduranceOut())
-		{
-			EnduranceComponent->ConsumeEndurance(EnduranceComponent->GetEnduranceDrainRate() * DeltaTime);
-		}
-		else
-		{
-			IsSprinting = false;
-			EnduranceComponent->RestoreEndurance(DeltaTime);
-		}
-	}
-}
-
-// Called to bind functionality to input
-void ALMADefaultCharacter::SetupPlayerInputComponent(UInputComponent* PlayerInputComponent)
-{
-	Super::SetupPlayerInputComponent(PlayerInputComponent);
-
-	PlayerInputComponent->BindAxis("MoveForward", this, &ALMADefaultCharacter::MoveForward);
-	PlayerInputComponent->BindAxis("MoveRight", this, &ALMADefaultCharacter::MoveRight);
-	PlayerInputComponent->BindAxis("ZoomCamera", this, &ALMADefaultCharacter::ZoomCamera);
-
-	PlayerInputComponent->BindAction("Sprint", IE_Pressed, this, &ALMADefaultCharacter::StartSprint);
-	PlayerInputComponent->BindAction("Sprint", IE_Released, this, &ALMADefaultCharacter::EndSprint);
-
-	PlayerInputComponent->BindAction("Fire", IE_Pressed, WeaponComponent, &ULMAWeaponComponent::StartShoot);
-	PlayerInputComponent->BindAction("Fire", IE_Released, WeaponComponent, &ULMAWeaponComponent::StopShoot);
-	PlayerInputComponent->BindAction("Reload", IE_Pressed, WeaponComponent, &ULMAWeaponComponent::Reload);
-}
 
 ULMAHealthComponent* ALMADefaultCharacter::GetHealthComponent() const
 {
@@ -203,9 +206,4 @@ ULMAHealthComponent* ALMADefaultCharacter::GetHealthComponent() const
 ULMAEnduranceComponent* ALMADefaultCharacter::GetEnduranceComponent() const
 {
 	return EnduranceComponent;
-}
-
-bool ALMADefaultCharacter::GetIsSprinting() const
-{
-	return IsSprinting;
 }

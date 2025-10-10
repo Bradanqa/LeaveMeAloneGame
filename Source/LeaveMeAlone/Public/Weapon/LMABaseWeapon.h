@@ -40,9 +40,6 @@ public:
 	virtual void Tick(float DeltaTime) override;
 
 public:
-	UPROPERTY(EditAnywhere, BlueprintReadOnly, Category = "Weapon")
-	float FireRate = 0.20f;
-
 	FOnClipEmptySignature OnClipEmpty;
 
 	void ChangeClip();
@@ -51,6 +48,10 @@ public:
 	void Fire();
 
 protected:
+	UPROPERTY(EditAnywhere, BlueprintReadOnly, Category = "Weapon")
+	float FireRate = 0.20f;
+
+
 	UPROPERTY(VisibleAnywhere, BlueprintReadWrite, Category = "Weapon")
 	USkeletalMeshComponent* WeaponComponent;
 

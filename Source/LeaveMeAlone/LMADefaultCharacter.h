@@ -26,6 +26,35 @@ public:
 	ALMADefaultCharacter();
 
 protected:
+	// Called when the game starts or when spawned
+	virtual void BeginPlay() override;
+
+public:
+	// Called every frame
+	virtual void Tick(float DeltaTime) override;
+	// Called to bind functionality to input
+	virtual void SetupPlayerInputComponent(class UInputComponent* PlayerInputComponent) override;
+
+private:
+	float YRotation = -75.0f;
+	float FOV = 55.0f;
+	float ArmLength = 1400.0f;
+	float SprintMaxSpeed = 450;
+	float WalkMaxSpeed = 300;
+
+	void MoveForward(float Value);
+	void MoveRight(float Value);
+	void StartSprint();
+	void EndSprint();
+	void ZoomCamera(float Value);
+
+	void RotationPlayerOnCursor();
+
+	void OnDeath();
+	void OnHealthChanged(float NewHealth);
+	void OnEnduranceChanged(float NewEndurance);
+
+protected:
 	UPROPERTY(VisibleAnywhere, BlueprintReadWrite, Category = "Components|Health")
 	ULMAHealthComponent* HealthComponent;
 
@@ -59,50 +88,12 @@ protected:
 	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "Camera")
 	int MaxArmLength = 1400;
 
-	// Called when the game starts or when spawned
-	virtual void BeginPlay() override;
-
-private:
-	float YRotation = -75.0f;
-	float FOV = 55.0f;
-	float ArmLength = 1400.0f;
-	float SprintMaxSpeed = 450;
-	float WalkMaxSpeed = 300;
-
-	void MoveForward(float Value);
-	void MoveRight(float Value);
-	void ZoomCamera(float Value);
-
-	void RotationPlayerOnCursor();
-
-private:
-	void OnDeath();
-	void OnHealthChanged(float NewHealth);
-	void OnEnduranceChanged(float NewEndurance);
+	bool IsSprinting = false;
 
 public:	
-	// Called every frame
-	virtual void Tick(float DeltaTime) override;
-
-	// Called to bind functionality to input
-	virtual void SetupPlayerInputComponent(class UInputComponent* PlayerInputComponent) override;
-
 	UFUNCTION()
 	ULMAHealthComponent* GetHealthComponent() const;
 
 	UFUNCTION()
 	ULMAEnduranceComponent* GetEnduranceComponent() const;
-
-	UFUNCTION(BlueprintCallable)
-	bool GetIsSprinting() const;
-
-	UPROPERTY()
-	bool IsSprinting = false;
-
-	UFUNCTION()
-	void StartSprint();
-	
-	UFUNCTION()
-	void EndSprint();
-
 };

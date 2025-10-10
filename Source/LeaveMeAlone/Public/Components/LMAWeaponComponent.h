@@ -29,15 +29,12 @@ public:
 	virtual void TickComponent(float DeltaTime, ELevelTick TickType, FActorComponentTickFunction* ThisTickFunction) override;
 
 
+protected:
 	UPROPERTY(EditDefaultsOnly, Category = "Weapon")
 	TSubclassOf<ALMABaseWeapon> WeaponClass;
 
 	UPROPERTY()
 	ALMABaseWeapon* Weapon = nullptr;
-
-	void SpawnWeapon();
-	void StartShoot();
-	void StopShoot();
 		
 	UPROPERTY(EditDefaultsOnly, Category = "Weapon")
 	UAnimMontage* ReloadMontage;
@@ -46,12 +43,17 @@ public:
 	bool Sprinting = false;
 	FTimerHandle ShootTimerHandle;
 
-	void SetSprinting(bool SprintingValue);
+	void SpawnWeapon();
 	void OnShootTimer();
 	void OnClipEmptyCallback();
-	void Reload();
 	void PerformReload();
 	void InitAnimNotify();
 	void OnNotifyReloadFinished(USkeletalMeshComponent* SkeletalMesh);
 	bool CanReload() const;
+
+public:
+	void StartShoot();
+	void StopShoot();
+	void Reload();
+	void SetSprinting(bool SprintingValue);
 };

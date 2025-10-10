@@ -29,6 +29,17 @@ void ALMABaseWeapon::Tick(float DeltaTime)
 
 }
 
+
+void ALMABaseWeapon::ChangeClip()
+{
+	CurrentAmmoWeapon.Bullets = AmmoWeapon.Bullets;
+}
+
+bool ALMABaseWeapon::IsClipFull() const
+{
+	return CurrentAmmoWeapon.Bullets >= AmmoWeapon.Bullets;
+}
+
 float ALMABaseWeapon::GetFireRate() const
 {
 	return FireRate;
@@ -38,6 +49,7 @@ void ALMABaseWeapon::Fire()
 {
 	Shoot();
 }
+
 
 void ALMABaseWeapon::Shoot()
 {
@@ -54,16 +66,6 @@ void ALMABaseWeapon::Shoot()
 	}
 
 	DecrementBullets();
-}
-
-void ALMABaseWeapon::ChangeClip()
-{
-	CurrentAmmoWeapon.Bullets = AmmoWeapon.Bullets;
-}
-
-bool ALMABaseWeapon::IsCurrentClipEmpty() const
-{
-	return CurrentAmmoWeapon.Bullets == 0;
 }
 
 DEFINE_LOG_CATEGORY_STATIC(LogWeapon, All, All);
@@ -83,7 +85,7 @@ void ALMABaseWeapon::DecrementBullets()
 	}
 }
 
-bool ALMABaseWeapon::IsClipFull() const
+bool ALMABaseWeapon::IsCurrentClipEmpty() const
 {
-	return CurrentAmmoWeapon.Bullets >= AmmoWeapon.Bullets;
+	return CurrentAmmoWeapon.Bullets == 0;
 }

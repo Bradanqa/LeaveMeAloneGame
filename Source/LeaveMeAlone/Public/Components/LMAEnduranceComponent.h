@@ -23,25 +23,15 @@ protected:
 	// Called when the game starts
 	virtual void BeginPlay() override;
 
-private:
+protected:
 	float Endurance = 0.0f;
+	float MaxEndurance = 100.0f;
+	float EnduranceRestoreRate = 15.0f;
+	float EnduranceDrainRate = 50;
+	float EnduranceRestoreDelay = 2.0f;
+	float TimeSinceLastDrain = 0.0f;
 
 	void OnEnduranceChanging(float Value);
-
-protected:
-	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "Endurance")
-	float MaxEndurance = 100.0f;
-
-	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "Endurance")
-	float EnduranceRestoreRate = 15.0f;
-
-	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "Endurance")
-	float EnduranceDrainRate = 50;
-
-	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "Endurance")
-	float EnduranceRestoreDelay = 2.0f;
-
-	float TimeSinceLastDrain = 0.0f;
 
 public:
 	UFUNCTION(BlueprintCallable)

@@ -3,6 +3,7 @@
 
 #include "Components/LMAHealthComponent.h"
 
+
 // Sets default values for this component's properties
 ULMAHealthComponent::ULMAHealthComponent()
 {
@@ -12,7 +13,6 @@ ULMAHealthComponent::ULMAHealthComponent()
 
 	// ...
 }
-
 
 // Called when the game starts
 void ULMAHealthComponent::BeginPlay()
@@ -27,6 +27,7 @@ void ULMAHealthComponent::BeginPlay()
 		OwnerComponent->OnTakeAnyDamage.AddDynamic(this, &ULMAHealthComponent::OnTakeAnyDamage);
 	}
 }
+
 
 void ULMAHealthComponent::OnTakeAnyDamage(
 	AActor* DamagedActor,
@@ -47,6 +48,18 @@ void ULMAHealthComponent::OnTakeAnyDamage(
 	}
 }
 
+
+bool ULMAHealthComponent::IsHealthFull() const
+{
+	return FMath::IsNearlyEqual(Health, MaxHealth);
+}
+
+
+bool ULMAHealthComponent::IsDead() const
+{
+	return Health <= 0.0f;
+}
+
 bool ULMAHealthComponent::AddHealth(float NewHealth)
 {
 	if (IsDead() || IsHealthFull())
@@ -57,14 +70,4 @@ bool ULMAHealthComponent::AddHealth(float NewHealth)
 	Health = FMath::Clamp(Health + NewHealth, 0.0f, MaxHealth);
 	OnHealthChanged.Broadcast(Health);
 	return true;
-}
-
-bool ULMAHealthComponent::IsHealthFull() const
-{
-	return FMath::IsNearlyEqual(Health, MaxHealth);
-}
-
-bool ULMAHealthComponent::IsDead() const
-{
-	return Health <= 0.0f;
 }

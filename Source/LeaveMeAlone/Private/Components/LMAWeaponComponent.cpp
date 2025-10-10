@@ -17,7 +17,6 @@ ULMAWeaponComponent::ULMAWeaponComponent()
 	// ...
 }
 
-
 // Called when the game starts
 void ULMAWeaponComponent::BeginPlay()
 {
@@ -27,7 +26,6 @@ void ULMAWeaponComponent::BeginPlay()
 	InitAnimNotify();
 }
 
-
 // Called every frame
 void ULMAWeaponComponent::TickComponent(float DeltaTime, ELevelTick TickType, FActorComponentTickFunction* ThisTickFunction)
 {
@@ -35,6 +33,7 @@ void ULMAWeaponComponent::TickComponent(float DeltaTime, ELevelTick TickType, FA
 
 	// ...
 }
+
 
 void ULMAWeaponComponent::SpawnWeapon()
 {
@@ -51,31 +50,6 @@ void ULMAWeaponComponent::SpawnWeapon()
 	}
 }
 
-void ULMAWeaponComponent::StartShoot()
-{
-	
-	if (Weapon && !AnimReloading && !Sprinting)
-	{
-		Weapon->Fire();
-		GetWorld()->GetTimerManager().SetTimer(
-				ShootTimerHandle,
-				this,
-				&ULMAWeaponComponent::OnShootTimer,
-				Weapon->GetFireRate(),
-				true);
-	}
-}
-
-void ULMAWeaponComponent::StopShoot()
-{
-	GetWorld()->GetTimerManager().ClearTimer(ShootTimerHandle);
-}
-
-void ULMAWeaponComponent::SetSprinting(bool SprintingValue)
-{
-	Sprinting = SprintingValue;
-}
-
 void ULMAWeaponComponent::OnShootTimer()
 {
 	if (Weapon && !AnimReloading && !Sprinting)
@@ -89,11 +63,6 @@ void ULMAWeaponComponent::OnShootTimer()
 }
 
 void ULMAWeaponComponent::OnClipEmptyCallback()
-{
-	PerformReload();
-}
-
-void ULMAWeaponComponent::Reload()
 {
 	PerformReload();
 }
@@ -144,4 +113,30 @@ void ULMAWeaponComponent::OnNotifyReloadFinished(USkeletalMeshComponent* Skeleta
 bool ULMAWeaponComponent::CanReload() const
 {
 	return !AnimReloading && Weapon && !Weapon->IsClipFull();
+}
+
+
+void ULMAWeaponComponent::StartShoot()
+{
+
+	if (Weapon && !AnimReloading && !Sprinting)
+	{
+		Weapon->Fire();
+		GetWorld()->GetTimerManager().SetTimer(ShootTimerHandle, this, &ULMAWeaponComponent::OnShootTimer, Weapon->GetFireRate(), true);
+	}
+}
+
+void ULMAWeaponComponent::StopShoot()
+{
+	GetWorld()->GetTimerManager().ClearTimer(ShootTimerHandle);
+}
+
+void ULMAWeaponComponent::Reload()
+{
+	PerformReload();
+}
+
+void ULMAWeaponComponent::SetSprinting(bool SprintingValue)
+{
+	Sprinting = SprintingValue;
 }
