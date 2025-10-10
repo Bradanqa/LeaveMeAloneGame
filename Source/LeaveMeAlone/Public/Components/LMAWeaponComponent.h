@@ -36,14 +36,21 @@ public:
 	ALMABaseWeapon* Weapon = nullptr;
 
 	void SpawnWeapon();
-	void Fire();
+	void StartShoot();
+	void StopShoot();
 		
 	UPROPERTY(EditDefaultsOnly, Category = "Weapon")
 	UAnimMontage* ReloadMontage;
 
 	bool AnimReloading = false;
+	bool Sprinting = false;
+	FTimerHandle ShootTimerHandle;
 
+	void SetSprinting(bool SprintingValue);
+	void OnShootTimer();
+	void OnClipEmptyCallback();
 	void Reload();
+	void PerformReload();
 	void InitAnimNotify();
 	void OnNotifyReloadFinished(USkeletalMeshComponent* SkeletalMesh);
 	bool CanReload() const;

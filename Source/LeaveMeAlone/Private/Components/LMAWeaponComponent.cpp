@@ -46,26 +46,74 @@ void ULMAWeaponComponent::SpawnWeapon()
 		{
 			FAttachmentTransformRules AttachmentRules(EAttachmentRule::SnapToTarget, false);
 			Weapon->AttachToComponent(Character->GetMesh(), AttachmentRules, "r_Weapon_Socket");
+			Weapon->OnClipEmpty.AddUObject(this, &ULMAWeaponComponent::OnClipEmptyCallback);
 		}
 	}
 }
 
-void ULMAWeaponComponent::Fire()
+void ULMAWeaponComponent::StartShoot()
 {
-	if (Weapon && !AnimReloading)
+	
+	if (Weapon && !AnimReloading && !Sprinting)
+	{
+		Weapon->Fire();
+		GetWorld()->GetTimerManager().SetTimer(
+				ShootTimerHandle,
+				this,
+				&ULMAWeaponComponent::OnShootTimer,
+				Weapon->GetFireRate(),
+				true);
+	}
+}
+
+void ULMAWeaponComponent::StopShoot()
+{
+	GetWorld()->GetTimerManager().ClearTimer(ShootTimerHandle);
+}
+
+void ULMAWeaponComponent::SetSprinting(bool SprintingValue)
+{
+	Sprinting = SprintingValue;
+}
+
+void ULMAWeaponComponent::OnShootTimer()
+{
+	if (Weapon && !AnimReloading && !Sprinting)
 	{
 		Weapon->Fire();
 	}
+	else
+	{
+		StopShoot();
+	}
+}
+
+void ULMAWeaponComponent::OnClipEmptyCallback()
+{
+	PerformReload();
 }
 
 void ULMAWeaponComponent::Reload()
 {
-	if (!CanReload())
+	PerformReload();
+}
+
+void ULMAWeaponComponent::PerformReload()
+{
+	if (!CanReload() || !Weapon || Sprinting)
 		return;
+
+	if (Weapon->IsClipFull())
+		return;
+
 	Weapon->ChangeClip();
 	AnimReloading = true;
+
 	ACharacter* Character = Cast<ACharacter>(GetOwner());
-	Character->PlayAnimMontage(ReloadMontage);
+	if (Character && ReloadMontage)
+	{
+		Character->PlayAnimMontage(ReloadMontage);
+	}
 }
 
 void ULMAWeaponComponent::InitAnimNotify()
@@ -95,5 +143,5 @@ void ULMAWeaponComponent::OnNotifyReloadFinished(USkeletalMeshComponent* Skeleta
 
 bool ULMAWeaponComponent::CanReload() const
 {
-	return !AnimReloading;
+	return !AnimReloading && Weapon && !Weapon->IsClipFull();
 }

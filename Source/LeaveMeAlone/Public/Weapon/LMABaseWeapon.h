@@ -20,6 +20,8 @@ struct FAmmoWeapon
 };
 
 
+DECLARE_MULTICAST_DELEGATE(FOnClipEmptySignature);
+
 UCLASS()
 class LEAVEMEALONE_API ALMABaseWeapon : public AActor
 {
@@ -38,6 +40,14 @@ public:
 	virtual void Tick(float DeltaTime) override;
 
 public:
+	UPROPERTY(EditAnywhere, BlueprintReadOnly, Category = "Weapon")
+	float FireRate = 0.20f;
+
+	FOnClipEmptySignature OnClipEmpty;
+
+	void ChangeClip();
+	bool IsClipFull() const;
+	float GetFireRate() const;
 	void Fire();
 
 protected:
@@ -56,7 +66,4 @@ protected:
 	void Shoot();
 	void DecrementBullets();
 	bool IsCurrentClipEmpty() const;
-
-public:
-	void ChangeClip();
 };

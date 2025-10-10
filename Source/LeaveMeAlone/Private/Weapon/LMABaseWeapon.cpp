@@ -11,6 +11,8 @@ ALMABaseWeapon::ALMABaseWeapon()
 
 	WeaponComponent = CreateDefaultSubobject<USkeletalMeshComponent>("Weapon");
 	SetRootComponent(WeaponComponent);
+
+	CurrentAmmoWeapon.Bullets = 30;
 }
 
 // Called when the game starts or when spawned
@@ -25,6 +27,11 @@ void ALMABaseWeapon::Tick(float DeltaTime)
 {
 	Super::Tick(DeltaTime);
 
+}
+
+float ALMABaseWeapon::GetFireRate() const
+{
+	return FireRate;
 }
 
 void ALMABaseWeapon::Fire()
@@ -63,10 +70,20 @@ DEFINE_LOG_CATEGORY_STATIC(LogWeapon, All, All);
 
 void ALMABaseWeapon::DecrementBullets()
 {
-	CurrentAmmoWeapon.Bullets--;
+	if (CurrentAmmoWeapon.Bullets > 0)
+	{
+		CurrentAmmoWeapon.Bullets--;
+	}
+
 	UE_LOG(LogWeapon, Display, TEXT("Bullets = %s"), *FString::FromInt(CurrentAmmoWeapon.Bullets));
+
 	if (IsCurrentClipEmpty())
 	{
-		ChangeClip();
+		OnClipEmpty.Broadcast();
 	}
+}
+
+bool ALMABaseWeapon::IsClipFull() const
+{
+	return CurrentAmmoWeapon.Bullets >= AmmoWeapon.Bullets;
 }

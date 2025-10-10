@@ -159,6 +159,11 @@ void ALMADefaultCharacter::Tick(float DeltaTime)
 
 	GetCharacterMovement()->MaxWalkSpeed = IsSprinting ? SprintMaxSpeed : WalkMaxSpeed;
 
+	if (WeaponComponent)
+	{
+		WeaponComponent->SetSprinting(IsSprinting);
+	}
+
 	if (EnduranceComponent)
 	{
 		if (IsSprinting && !EnduranceComponent->IsEnduranceOut())
@@ -185,7 +190,8 @@ void ALMADefaultCharacter::SetupPlayerInputComponent(UInputComponent* PlayerInpu
 	PlayerInputComponent->BindAction("Sprint", IE_Pressed, this, &ALMADefaultCharacter::StartSprint);
 	PlayerInputComponent->BindAction("Sprint", IE_Released, this, &ALMADefaultCharacter::EndSprint);
 
-	PlayerInputComponent->BindAction("Fire", IE_Pressed, WeaponComponent, &ULMAWeaponComponent::Fire);
+	PlayerInputComponent->BindAction("Fire", IE_Pressed, WeaponComponent, &ULMAWeaponComponent::StartShoot);
+	PlayerInputComponent->BindAction("Fire", IE_Released, WeaponComponent, &ULMAWeaponComponent::StopShoot);
 	PlayerInputComponent->BindAction("Reload", IE_Pressed, WeaponComponent, &ULMAWeaponComponent::Reload);
 }
 
