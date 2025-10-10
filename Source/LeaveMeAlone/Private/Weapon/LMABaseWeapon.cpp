@@ -50,6 +50,12 @@ void ALMABaseWeapon::Fire()
 	Shoot();
 }
 
+FAmmoWeapon ALMABaseWeapon::GetCurrentAmmoWeapon() const
+{
+	return CurrentAmmoWeapon;
+}
+
+
 
 void ALMABaseWeapon::Shoot()
 {
@@ -68,16 +74,12 @@ void ALMABaseWeapon::Shoot()
 	DecrementBullets();
 }
 
-DEFINE_LOG_CATEGORY_STATIC(LogWeapon, All, All);
-
 void ALMABaseWeapon::DecrementBullets()
 {
 	if (CurrentAmmoWeapon.Bullets > 0)
 	{
 		CurrentAmmoWeapon.Bullets--;
 	}
-
-	UE_LOG(LogWeapon, Display, TEXT("Bullets = %s"), *FString::FromInt(CurrentAmmoWeapon.Bullets));
 
 	if (IsCurrentClipEmpty())
 	{

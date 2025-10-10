@@ -47,6 +47,9 @@ public:
 	float GetFireRate() const;
 	void Fire();
 
+
+	FAmmoWeapon GetCurrentAmmoWeapon() const;
+
 protected:
 	UPROPERTY(EditAnywhere, BlueprintReadOnly, Category = "Weapon")
 	float FireRate = 0.20f;

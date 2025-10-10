@@ -8,7 +8,6 @@
 
 
 DECLARE_MULTICAST_DELEGATE(FOnDeath)
-DECLARE_MULTICAST_DELEGATE_OneParam(FOnHealthChanged, float)
 
 
 UCLASS( ClassGroup=(Custom), meta=(BlueprintSpawnableComponent) )
@@ -52,5 +51,4 @@ public:
 	bool AddHealth(float NewHealth);
 
 	FOnDeath OnDeath;
-	FOnHealthChanged OnHealthChanged;
 };

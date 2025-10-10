@@ -9,6 +9,7 @@
 
 class ALMABaseWeapon;
 class ULMAReloadFinishedAnimNotify;
+struct FAmmoWeapon;
 
 
 UCLASS( ClassGroup=(Custom), meta=(BlueprintSpawnableComponent) )
@@ -52,8 +53,14 @@ protected:
 	bool CanReload() const;
 
 public:
+	UFUNCTION(BlueprintCallable)
+	bool GetCurrentWeaponAmmo(FAmmoWeapon& AmmoWeapon) const;
+
 	void StartShoot();
+
+	UFUNCTION(BlueprintCallable, Category = "Weapon")
 	void StopShoot();
+
 	void Reload();
 	void SetSprinting(bool SprintingValue);
 };

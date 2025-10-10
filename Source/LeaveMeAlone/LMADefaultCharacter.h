@@ -51,7 +51,6 @@ private:
 	void RotationPlayerOnCursor();
 
 	void OnDeath();
-	void OnHealthChanged(float NewHealth);
 	void OnEnduranceChanged(float NewEndurance);
 
 protected:
